@@ -1,0 +1,50 @@
+:root {
+  /* Paleta Premium Navy & Bento Grid */
+  --color-bg-main: #f5f6f9;
+  --color-bg-card: #FFFFFF;
+  --color-primary: #0B2545;
+  --color-secondary: #13315C;
+  --color-dark-card: #0d121c;
+  --color-amber-bg: #fef3c7;
+  --color-amber-border: #fde68a;
+  --color-amber-text: #92400e;
+  --color-cyan-accent: #00b4d8;
+  
+  /* Status de Conformidade */
+  --status-ok: #28A745;
+  --status-alert: #FFC107;
+  --status-critical: #DC3545;
+
+  /* Formas e Sombras */
+  --card-radius: 22px;
+  --shadow-bento: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --shadow-bento-hover: 0 8px 30px rgba(11, 37, 69, 0.08);
+
+  /* Fontes e Textos */
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg-main);
+  background-image: radial-gradient(rgba(11, 37, 69, 0.1) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+  color: var(--text-dark);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}

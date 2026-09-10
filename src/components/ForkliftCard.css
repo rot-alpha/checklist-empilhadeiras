@@ -1,0 +1,132 @@
+/* ─── Bento Item Card ─── */
+.forklift-bento-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.forklift-bento-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(11, 37, 69, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+}
+
+.forklift-bento-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(11, 37, 69, 0.2);
+  box-shadow: 0 6px 16px rgba(11, 37, 69, 0.06);
+}
+
+/* Tag quadrada da esquerda */
+.bento-item-tag {
+  width: 46px;
+  height: 48px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  border: 1px solid rgba(11, 37, 69, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tag-prefix {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.tag-number {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1.1;
+}
+
+/* Detalhes centrais */
+.bento-item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.bento-item-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bento-item-subline {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.subline-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+/* Status Badge na direita */
+.bento-item-badge-wrap {
+  flex-shrink: 0;
+}
+
+.bento-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.status-dot-mini {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.bento-status-badge.status-ok {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--status-ok);
+}
+.bento-status-badge.status-ok .status-dot-mini {
+  background: var(--status-ok);
+}
+
+.bento-status-badge.status-alert {
+  background: rgba(255, 193, 7, 0.15);
+  color: #b45309;
+}
+.bento-status-badge.status-alert .status-dot-mini {
+  background: #f59e0b;
+}
+
+.bento-status-badge.status-critical {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--status-critical);
+}
+.bento-status-badge.status-critical .status-dot-mini {
+  background: var(--status-critical);
+}
