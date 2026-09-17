@@ -1,0 +1,163 @@
+/* ═══════════════════════════════════════════
+   HORIMETER PANEL (NUMERIC CARDS)
+   ═══════════════════════════════════════════ */
+
+/* Summary Metrics Row */
+.horimeter-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.horimeter-summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.horimeter-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-blue);
+}
+
+.horimeter-summary-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.horimeter-summary-card__value-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.horimeter-summary-card__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.horimeter-summary-card__unit {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.horimeter-summary-card__hint {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.horimeter-summary-card__hint.highlight-model {
+  color: var(--accent-orange);
+  font-weight: 600;
+}
+
+/* Numeric Cards Grid */
+.horimeter-numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.horimeter-number-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.horimeter-number-card:hover {
+  border-color: var(--accent-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.horimeter-number-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.horimeter-number-card__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.horimeter-number-card__pct {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-blue);
+}
+
+[data-theme='dark'] .horimeter-number-card__pct {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.horimeter-number-card__main {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.horimeter-number-card__val {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.horimeter-number-card__lbl {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.horimeter-number-card__bar-bg {
+  width: 100%;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.horimeter-number-card__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), #60a5fa);
+  border-radius: 9999px;
+  transition: width 0.4s ease;
+}
+
+@media (max-width: 840px) {
+  .horimeter-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

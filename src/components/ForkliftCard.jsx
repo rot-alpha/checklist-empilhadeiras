@@ -1,71 +1,36 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ConformityRing from './ConformityRing';
+import { getMachineStatus } from '../data/csvParser';
 import './ForkliftCard.css';
 
-const ForkliftCard = ({ data }) => {
-  const modelo = data['Modelo'] || 'Desconhecido';
-  const horimetro = data['Leitura do Horímetro Inicial'] || 'N/A';
-  
-  const criticos = ['Botão de Emergência', 'Funcionamento de Direção', 'Cinto de Segurança', 'Sistema de Elevação/Abaixamento'];
-  let status = 'ok';
-  
-  const entries = Object.entries(data);
-  let isAlert = false;
-  let isCritical = false;
-
-  for (const [key, value] of entries) {
-    if (value === 'Não Conforme') {
-      if (criticos.includes(key) || key.includes('VAZAMENTO') || key.includes('Óleo')) {
-        isCritical = true;
-      } else {
-        isAlert = true;
-      }
-    }
-  }
-
-  if (isCritical) status = 'critical';
-  else if (isAlert) status = 'alert';
-  else status = 'ok';
-
-  const statusMap = {
-    'ok': { label: 'Disponível', class: 'status-ok', icon: '●' },
-    'alert': { label: 'Atenção', class: 'status-alert', icon: '▲' },
-    'critical': { label: 'Parada', class: 'status-critical', icon: '■' }
-  };
-
-  const currentStatus = statusMap[status];
+const ForkliftCard = ({ modelo, conformity, latestRow }) => {
+  const status = latestRow ? getMachineStatus(latestRow) : { key: 'ok', label: 'Disponível', color: 'var(--status-ok)' };
 
   return (
-    <Link to={`/empilhadeira/${encodeURIComponent(modelo)}`} className="forklift-bento-link">
-      <div className={`forklift-bento-item ${currentStatus.class}`}>
-        {/* Bloco de Identificação Esquerda (estilo data do schedule) */}
-        <div className="bento-item-tag">
-          <span className="tag-prefix">EER</span>
-          <span className="tag-number">{modelo.replace(/[^0-9]/g, '').slice(-2) || '17'}</span>
+    <Link to={`/empilhadeira/${encodeURIComponent(modelo)}`} className="fk-card">
+      <div className="fk-card__inner">
+        {/* Left: Ring */}
+        <div className="fk-card__ring">
+          <ConformityRing value={conformity} size={88} strokeWidth={7} />
         </div>
 
-        {/* Informações Principais */}
-        <div className="bento-item-details">
-          <h4 className="bento-item-name">{modelo}</h4>
-          <div className="bento-item-subline">
-            <span className="subline-chip" title="Última Inspeção">
-              🕒 {data['Data e Hora da Inspeção'] ? data['Data e Hora da Inspeção'].split(' ')[1] || data['Data e Hora da Inspeção'] : '07:30'}
-            </span>
-            <span className="subline-chip" title="Operador">
-              👤 {data['Nome do Operador'] || 'Operador'}
-            </span>
-            <span className="subline-chip" title="Horímetro">
-              ⏱️ {horimetro}h
+        {/* Center: Info */}
+        <div className="fk-card__info">
+          <h3 className="fk-card__name">{modelo}</h3>
+          <div className="fk-card__meta">
+            <span className="fk-card__status" style={{ '--status-color': status.color }}>
+              <span className="fk-card__status-dot" />
+              {status.label}
             </span>
           </div>
         </div>
 
-        {/* Status Badge estilo pílula */}
-        <div className="bento-item-badge-wrap">
-          <span className={`bento-status-badge ${currentStatus.class}`}>
-            <span className="status-dot-mini" />
-            {currentStatus.label}
-          </span>
+        {/* Right: Arrow */}
+        <div className="fk-card__arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
         </div>
       </div>
     </Link>

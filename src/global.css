@@ -1,50 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM — Light / Dark Mode
+   ═══════════════════════════════════════════ */
+
 :root {
-  /* Paleta Premium Navy & Bento Grid */
-  --color-bg-main: #f5f6f9;
-  --color-bg-card: #FFFFFF;
-  --color-primary: #0B2545;
-  --color-secondary: #13315C;
-  --color-dark-card: #0d121c;
-  --color-amber-bg: #fef3c7;
-  --color-amber-border: #fde68a;
-  --color-amber-text: #92400e;
-  --color-cyan-accent: #00b4d8;
-  
-  /* Status de Conformidade */
-  --status-ok: #28A745;
-  --status-alert: #FFC107;
-  --status-critical: #DC3545;
+  /* Backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F7;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAFAFA;
+  --bg-navbar: rgba(255, 255, 255, 0.85);
+  --bg-modal-overlay: rgba(0, 0, 0, 0.4);
+  --bg-input: #F5F5F7;
 
-  /* Formas e Sombras */
-  --card-radius: 22px;
-  --shadow-bento: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
-  --shadow-bento-hover: 0 8px 30px rgba(11, 37, 69, 0.08);
+  /* Text */
+  --text-primary: #111111;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-inverse: #FFFFFF;
 
-  /* Fontes e Textos */
-  --text-dark: #1e293b;
-  --text-muted: #64748b;
+  /* Accent */
+  --accent-blue: #2563EB;
+  --accent-blue-hover: #1D4ED8;
+  --accent-blue-light: rgba(37, 99, 235, 0.08);
+  --accent-orange: #F97316;
+  --accent-orange-light: rgba(249, 115, 22, 0.08);
+
+  /* Status */
+  --status-ok: #22C55E;
+  --status-ok-bg: rgba(34, 197, 94, 0.08);
+  --status-alert: #F59E0B;
+  --status-alert-bg: rgba(245, 158, 11, 0.08);
+  --status-critical: #EF4444;
+  --status-critical-bg: rgba(239, 68, 68, 0.08);
+
+  /* Borders & Shadows */
+  --border-color: #E5E7EB;
+  --border-color-strong: #D1D5DB;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 24px rgba(37, 99, 235, 0.1);
+
+  /* Shape */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* Font */
   --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Transition */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-* {
+/* ─── Dark Mode ─── */
+[data-theme="dark"] {
+  --bg-primary: #0D0D0D;
+  --bg-secondary: #1A1A1A;
+  --bg-card: #1E1E1E;
+  --bg-card-hover: #252525;
+  --bg-navbar: rgba(13, 13, 13, 0.9);
+  --bg-modal-overlay: rgba(0, 0, 0, 0.7);
+  --bg-input: #252525;
+
+  --text-primary: #F5F5F5;
+  --text-secondary: #9CA3AF;
+  --text-tertiary: #6B7280;
+
+  --accent-blue: #3B82F6;
+  --accent-blue-hover: #2563EB;
+  --accent-blue-light: rgba(59, 130, 246, 0.12);
+  --accent-orange: #FB923C;
+  --accent-orange-light: rgba(251, 146, 60, 0.12);
+
+  --status-ok-bg: rgba(34, 197, 94, 0.12);
+  --status-alert-bg: rgba(245, 158, 11, 0.12);
+  --status-critical-bg: rgba(239, 68, 68, 0.12);
+
+  --border-color: #2D2D2D;
+  --border-color-strong: #404040;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 8px 24px rgba(59, 130, 246, 0.15);
+}
+
+/* ═══════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════ */
+
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  font-family: var(--font-family);
-  background-color: var(--color-bg-main);
-  background-image: radial-gradient(rgba(11, 37, 69, 0.1) 1.2px, transparent 1.2px);
-  background-size: 22px 22px;
-  color: var(--text-dark);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
+html {
+  scroll-behavior: smooth;
 }
 
-h1, h2, h3, h4 {
-  color: var(--color-primary);
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
   font-weight: 700;
   letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* ═══════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════ */
+
+.page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 6rem 2rem 3rem;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 5rem 1rem 2rem;
+  }
 }

@@ -1,0 +1,302 @@
+/* ═══════════════════════════════════════════
+   MACHINE CALENDAR COMPONENT (COMPACT)
+   ═══════════════════════════════════════════ */
+
+.machine-calendar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.machine-calendar-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-tertiary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+}
+
+/* Header */
+.machine-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.machine-calendar-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.machine-calendar-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme='dark'] .machine-calendar-icon {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.machine-calendar-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.machine-calendar-subtitle {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+}
+
+/* Actions */
+.machine-calendar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.machine-month-select {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.machine-month-select:focus {
+  border-color: var(--accent-blue);
+}
+
+.compiled-month-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+  transition: all var(--transition-fast);
+}
+
+.compiled-month-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Monthly KPIs Row Compact */
+.machine-calendar-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.machine-kpi-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.machine-kpi-item.highlight {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: rgba(37, 99, 235, 0.03);
+}
+
+[data-theme='dark'] .machine-kpi-item.highlight {
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.machine-kpi-item__lbl {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+
+.machine-kpi-item__val-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.machine-kpi-item__val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.machine-kpi-item.highlight .machine-kpi-item__val {
+  color: var(--accent-blue);
+}
+
+.machine-kpi-item__unit {
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.machine-kpi-item__sub {
+  font-size: 0.625rem;
+  color: var(--text-tertiary);
+  margin-top: 1px;
+}
+
+/* Calendar Grid Matrix Compact */
+.calendar-grid-wrapper {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.calendar-grid-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.calendar-weekday-cell {
+  text-align: center;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  padding: 2px 0;
+}
+
+.calendar-grid-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-cell {
+  height: 42px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.calendar-day-cell.is-empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.calendar-day-cell.has-usage {
+  border-color: rgba(37, 99, 235, 0.2);
+  background: var(--bg-card);
+}
+
+.calendar-day-cell.has-usage:hover {
+  border-color: var(--accent-blue);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.calendar-day-cell.is-pending {
+  border-style: dashed;
+  border-color: var(--accent-orange);
+}
+
+.calendar-day-num {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.calendar-day-cell.has-usage .calendar-day-num {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.calendar-usage-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.usage-hours {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.usage-sub {
+  display: none;
+}
+
+.calendar-pending-badge {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--accent-orange);
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .machine-calendar-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .machine-calendar-actions {
+    justify-content: space-between;
+  }
+  .machine-calendar-kpis {
+    grid-template-columns: 1fr;
+  }
+  .calendar-day-cell {
+    height: 38px;
+    padding: 2px 4px;
+  }
+  .usage-hours {
+    font-size: 0.625rem;
+  }
+}
