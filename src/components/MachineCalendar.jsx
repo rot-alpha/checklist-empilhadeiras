@@ -2,33 +2,58 @@ import React, { useState, useMemo } from 'react';
 import { 
   getMachineDailyUtilization, 
   getMachineMonthlyUtilization, 
+  extractDateStr,
+  extractDayKey,
   MONTH_NAMES 
 } from '../data/csvParser';
 import MonthlyUsageModal from './MonthlyUsageModal';
+import DailyInspectionModal from './DailyInspectionModal';
 import './MachineCalendar.css';
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-const MachineCalendar = ({ machineName, machineRows }) => {
-  // 1. Calculate day-by-day utilization
+const MachineCalendar = ({ machineName, machineRows = [] }) => {
+  // 1. Group raw machine inspections by dayKey (YYYY-MM-DD)
+  const inspectionsByDay = useMemo(() => {
+    const map = {};
+    machineRows.forEach(row => {
+      const rawDate = extractDateStr(row);
+      const dayKey = extractDayKey(rawDate);
+      if (!dayKey) return;
+      if (!map[dayKey]) {
+        map[dayKey] = [];
+      }
+      map[dayKey].push(row);
+    });
+    return map;
+  }, [machineRows]);
+
+  // 2. Calculate day-by-day utilization
   const dailyMap = useMemo(() => {
     return getMachineDailyUtilization(machineRows);
   }, [machineRows]);
 
-  // 2. Determine available months from dailyMap
+  // 3. Determine available months from dailyMap and inspection days
   const availableMonths = useMemo(() => {
     const monthsSet = new Set();
     Object.keys(dailyMap).forEach(dayKey => {
-      // dayKey is YYYY-MM-DD
+      const mKey = dayKey.substring(0, 7);
+      monthsSet.add(mKey);
+    });
+    Object.keys(inspectionsByDay).forEach(dayKey => {
       const mKey = dayKey.substring(0, 7);
       monthsSet.add(mKey);
     });
     return Array.from(monthsSet).sort().reverse();
-  }, [dailyMap]);
+  }, [dailyMap, inspectionsByDay]);
 
   // Selected month state (defaults to most recent available)
   const [selectedMonth, setSelectedMonth] = useState(availableMonths[0] || '');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMonthlyModalOpen, setIsMonthlyModalOpen] = useState(false);
+
+  // Daily Inspection Modal state
+  const [selectedDailyData, setSelectedDailyData] = useState(null);
+  const [isDailyModalOpen, setIsDailyModalOpen] = useState(false);
 
   // Sync selectedMonth if availableMonths changes
   React.useEffect(() => {
@@ -37,7 +62,7 @@ const MachineCalendar = ({ machineName, machineRows }) => {
     }
   }, [availableMonths, selectedMonth]);
 
-  // 3. Compute monthly aggregation for the selected month
+  // 4. Compute monthly aggregation for the selected month
   const monthlyData = useMemo(() => {
     if (!selectedMonth) return null;
     return getMachineMonthlyUtilization(dailyMap, selectedMonth);
@@ -73,23 +98,43 @@ const MachineCalendar = ({ machineName, machineRows }) => {
       const dayPad = String(day).padStart(2, '0');
       const dayKey = `${selectedMonth}-${dayPad}`;
       const usageInfo = dailyMap[dayKey] || null;
+      const dayInspections = inspectionsByDay[dayKey] || [];
+      const hasInspection = dayInspections.length > 0;
+      const hasFault = dayInspections.some(r => Object.values(r).includes('Não Conforme'));
 
       cells.push({
         empty: false,
         day,
         dayKey,
         usageInfo,
+        dayInspections,
+        hasInspection,
+        hasFault,
         key: dayKey,
       });
     }
 
     return cells;
-  }, [selectedMonth, dailyMap]);
+  }, [selectedMonth, dailyMap, inspectionsByDay]);
+
+  const handleDayClick = (cell) => {
+    if (cell.empty) return;
+    if (!cell.hasInspection && (!cell.usageInfo || cell.usageInfo.hours === null)) {
+      return; // No activity on this day
+    }
+
+    setSelectedDailyData({
+      dayKey: cell.dayKey,
+      dayRows: cell.dayInspections,
+      usageInfo: cell.usageInfo,
+    });
+    setIsDailyModalOpen(true);
+  };
 
   if (availableMonths.length === 0) {
     return (
       <div className="machine-calendar-empty">
-        Nenhum dado de horímetro disponível para esta máquina.
+        Nenhum dado de horímetro ou checklist disponível para esta máquina.
       </div>
     );
   }
@@ -108,8 +153,10 @@ const MachineCalendar = ({ machineName, machineRows }) => {
             </svg>
           </div>
           <div>
-            <h3 className="machine-calendar-title">Calendário de Utilização Diária</h3>
-            <span className="machine-calendar-subtitle">Consumo de horímetro apurado dia a dia</span>
+            <h3 className="machine-calendar-title">Calendário de Utilização e Inspeções</h3>
+            <span className="machine-calendar-subtitle">
+              Consumo de horímetro e relatórios diários (clique no dia para detalhar)
+            </span>
           </div>
         </div>
 
@@ -137,7 +184,7 @@ const MachineCalendar = ({ machineName, machineRows }) => {
           {/* Compilado do Mês Button */}
           <button 
             className="compiled-month-btn"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsMonthlyModalOpen(true)}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="20" x2="18" y2="10"/>
@@ -198,13 +245,30 @@ const MachineCalendar = ({ machineName, machineRows }) => {
             const info = cell.usageInfo;
             const hasHours = info && info.hours !== null && info.hours > 0;
             const isPending = info && info.pending;
+            const isClickable = cell.hasInspection || hasHours;
+
+            const tooltipText = cell.hasInspection
+              ? `Clique para ver o relatório: ${cell.dayInspections.length} inspeção(ões)${cell.hasFault ? ' (com não conformidade)' : ' (conforme)'}`
+              : hasHours 
+                ? `Horas apuradas: ${info.hours}h`
+                : undefined;
 
             return (
               <div 
                 key={cell.key} 
-                className={`calendar-day-cell ${hasHours ? 'has-usage' : ''} ${isPending ? 'is-pending' : ''}`}
+                onClick={() => isClickable && handleDayClick(cell)}
+                title={tooltipText}
+                className={`calendar-day-cell ${hasHours ? 'has-usage' : ''} ${isPending ? 'is-pending' : ''} ${isClickable ? 'is-clickable' : ''} ${cell.hasInspection ? 'has-inspection' : ''}`}
               >
-                <span className="calendar-day-num">{cell.day}</span>
+                <div className="calendar-day-header-cell">
+                  <span className="calendar-day-num">{cell.day}</span>
+                  {cell.hasInspection && (
+                    <span 
+                      className={`calendar-inspection-dot ${cell.hasFault ? 'has-fault' : 'all-ok'}`} 
+                      title={cell.hasFault ? 'Possui não conformidades' : 'Todas as inspeções conformes'}
+                    />
+                  )}
+                </div>
 
                 {hasHours && (
                   <div className="calendar-usage-badge">
@@ -213,7 +277,7 @@ const MachineCalendar = ({ machineName, machineRows }) => {
                   </div>
                 )}
 
-                {isPending && (
+                {isPending && !hasHours && (
                   <div className="calendar-pending-badge" title="Aguardando próxima leitura de amanhã para cálculo">
                     <span>Em and.</span>
                   </div>
@@ -222,16 +286,44 @@ const MachineCalendar = ({ machineName, machineRows }) => {
             );
           })}
         </div>
+
+        {/* Subtle helper notice below calendar */}
+        <div className="calendar-bottom-hint">
+          <span className="hint-indicator">
+            <span className="calendar-inspection-dot all-ok" /> Conforme
+          </span>
+          <span className="hint-indicator">
+            <span className="calendar-inspection-dot has-fault" /> Com Não-Conformidade
+          </span>
+          <span className="hint-text">
+            💡 Dica: Clique no dia desejado para ver o checklist detalhado com respostas e operador.
+          </span>
+        </div>
       </div>
 
       {/* Modal for Monthly Compilation */}
-      {isModalOpen && (
+      {isMonthlyModalOpen && (
         <MonthlyUsageModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isMonthlyModalOpen}
+          onClose={() => setIsMonthlyModalOpen(false)}
           machineName={machineName}
           monthLabel={formattedMonthLabel}
           monthlyData={monthlyData}
+        />
+      )}
+
+      {/* Modal for Daily Inspection Report */}
+      {isDailyModalOpen && selectedDailyData && (
+        <DailyInspectionModal
+          isOpen={isDailyModalOpen}
+          onClose={() => {
+            setIsDailyModalOpen(false);
+            setSelectedDailyData(null);
+          }}
+          machineName={machineName}
+          dayKey={selectedDailyData.dayKey}
+          dayRows={selectedDailyData.dayRows}
+          usageInfo={selectedDailyData.usageInfo}
         />
       )}
     </div>
@@ -239,3 +331,4 @@ const MachineCalendar = ({ machineName, machineRows }) => {
 };
 
 export default MachineCalendar;
+
