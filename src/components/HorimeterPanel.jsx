@@ -67,7 +67,7 @@ const HorimeterPanel = ({ fullData }) => {
           <div key={modelo} className="horimeter-number-card">
             <div className="horimeter-number-card__top">
               <span className="horimeter-number-card__name">{modelo}</span>
-              <span className="horimeter-number-card__pct">{percentage}% da frota</span>
+              <span className="horimeter-number-card__pct">{percentage}% do total</span>
             </div>
             
             <div className="horimeter-number-card__main">

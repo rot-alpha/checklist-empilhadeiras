@@ -13,6 +13,8 @@ export const IGNORE_KEYS = [
   'Nome do Operador',
   'Turno (Manhã / Tarde)',
   'Modelo',
+  'Leitura do Horímetro',
+  'Leitura do Horímetro Final',
   'Leitura do Horímetro Inicial',
   'Observações sobre o estado geral da empilhadeira. (Opcional)'
 ];
@@ -191,6 +193,15 @@ export function getOperatorCalendarDetail(data, operatorName) {
 }
 
 /**
+ * Extracts and normalizes the horimeter reading from a row.
+ * Prioritizes 'Leitura do Horímetro' and falls back to 'Leitura do Horímetro Inicial' if present.
+ */
+export function extractHorimeterReading(row) {
+  if (!row) return '';
+  return row['Leitura do Horímetro'] || row['Leitura do Horímetro Inicial'] || '';
+}
+
+/**
  * Returns hourmeter utilization per machine (cumulative).
  * Reads the hourmeter from all rows and returns the max per machine.
  */
@@ -200,7 +211,7 @@ export function getHorimeterUtilization(data) {
   data.forEach(row => {
     const modelo = row.Modelo;
     if (!modelo) return;
-    const raw = row['Leitura do Horímetro Inicial'] || '0';
+    const raw = extractHorimeterReading(row) || '0';
     const value = parseFloat(String(raw).replace(',', '.'));
     if (isNaN(value)) return;
 
@@ -214,7 +225,7 @@ export function getHorimeterUtilization(data) {
   });
 
   const allMaxes = Object.values(machineHours).map(m => m.max);
-  const globalMax = Math.max(...allMaxes, 1);
+  const totalFleetHours = allMaxes.reduce((acc, val) => acc + val, 0) || 1;
 
   return Object.entries(machineHours)
     .map(([modelo, stats]) => ({
@@ -222,7 +233,7 @@ export function getHorimeterUtilization(data) {
       maxHours: Math.round(stats.max),
       minHours: Math.round(stats.min),
       avgHours: Math.round(stats.sum / stats.count),
-      percentage: Math.round((stats.max / globalMax) * 100),
+      percentage: Math.round((stats.max / totalFleetHours) * 100),
     }))
     .sort((a, b) => b.maxHours - a.maxHours);
 }
@@ -241,7 +252,7 @@ export function getMachineDailyUtilization(machineRows) {
     const dayKey = extractDayKey(rawDate);
     if (!dayKey) return;
 
-    const rawH = row['Leitura do Horímetro Inicial'] || '';
+    const rawH = extractHorimeterReading(row);
     const hVal = parseFloat(String(rawH).replace(',', '.'));
     if (isNaN(hVal)) return;
 

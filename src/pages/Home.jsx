@@ -42,7 +42,10 @@ const Home = () => {
   const fleetModels = useMemo(() => getFleetModels(fullData), [fullData]);
 
   // Stats
-  const generalConformity = useMemo(() => calculateConformity(displayData), [displayData]);
+  const generalConformity = useMemo(() => {
+    if (displayData.length === 0) return null;
+    return calculateConformity(displayData);
+  }, [displayData]);
   const totalInspections = displayData.length;
   const topFaults = useMemo(() => getTopFaults(displayData, 5), [displayData]);
 
@@ -52,9 +55,10 @@ const Home = () => {
     fleetModels.forEach(row => {
       const modelo = row.Modelo;
       const machineData = displayData.filter(r => r.Modelo === modelo);
+      const inspectionsCount = machineData.length;
       machines[modelo] = {
-        conformity: calculateConformity(machineData),
-        inspections: machineData.length,
+        conformity: inspectionsCount > 0 ? calculateConformity(machineData) : null,
+        inspections: inspectionsCount,
         latestRow: row,
       };
     });
@@ -177,6 +181,7 @@ const Home = () => {
                 key={modelo}
                 modelo={modelo}
                 conformity={stats.conformity}
+                inspections={stats.inspections}
                 latestRow={stats.latestRow}
               />
             );

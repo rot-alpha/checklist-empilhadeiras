@@ -4,8 +4,9 @@ import ConformityRing from './ConformityRing';
 import { getMachineStatus } from '../data/csvParser';
 import './ForkliftCard.css';
 
-const ForkliftCard = ({ modelo, conformity, latestRow }) => {
+const ForkliftCard = ({ modelo, conformity, latestRow, inspections = 0 }) => {
   const status = latestRow ? getMachineStatus(latestRow) : { key: 'ok', label: 'Disponível', color: 'var(--status-ok)' };
+  const hasInspections = inspections > 0;
 
   return (
     <Link to={`/empilhadeira/${encodeURIComponent(modelo)}`} className="fk-card">
@@ -19,10 +20,17 @@ const ForkliftCard = ({ modelo, conformity, latestRow }) => {
         <div className="fk-card__info">
           <h3 className="fk-card__name">{modelo}</h3>
           <div className="fk-card__meta">
-            <span className="fk-card__status" style={{ '--status-color': status.color }}>
-              <span className="fk-card__status-dot" />
-              {status.label}
-            </span>
+            {hasInspections ? (
+              <span className="fk-card__status" style={{ '--status-color': status.color }}>
+                <span className="fk-card__status-dot" />
+                {status.label}
+              </span>
+            ) : (
+              <span className="fk-card__status" style={{ '--status-color': 'var(--text-secondary)' }}>
+                <span className="fk-card__status-dot" style={{ backgroundColor: 'var(--text-secondary)' }} />
+                Sem inspeção no mês
+              </span>
+            )}
           </div>
         </div>
 

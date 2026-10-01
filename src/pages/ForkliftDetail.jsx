@@ -10,7 +10,8 @@ import {
   getAvailableMonths,
   filterByMonth,
   getMachineDailyUtilization,
-  getMachineMonthlyUtilization
+  getMachineMonthlyUtilization,
+  extractHorimeterReading
 } from '../data/csvParser';
 import './ForkliftDetail.css';
 
@@ -50,10 +51,15 @@ const ForkliftDetail = () => {
   const displayData = useMemo(() => filterByMonth(machineFullData, selectedMonth), [machineFullData, selectedMonth]);
   const history = useMemo(() => [...displayData].reverse(), [displayData]);
 
-  const conformity = useMemo(() => calculateConformity(displayData), [displayData]);
+  const conformity = useMemo(() => {
+    if (displayData.length === 0) return null;
+    return calculateConformity(displayData);
+  }, [displayData]);
   const topFaults = useMemo(() => getTopFaults(displayData, 5), [displayData]);
   const latestRow = history[0] || {};
-  const status = latestRow.Modelo ? getMachineStatus(latestRow) : { key: 'ok', label: 'Disponível', color: 'var(--status-ok)' };
+  const status = displayData.length > 0
+    ? (latestRow.Modelo ? getMachineStatus(latestRow) : { key: 'ok', label: 'Disponível', color: 'var(--status-ok)' })
+    : { key: 'empty', label: 'Sem inspeção no mês', color: 'var(--text-secondary)' };
 
   // Calculate monthly utilization hours for the current selected month
   const monthlyUtil = useMemo(() => {
@@ -124,7 +130,7 @@ const ForkliftDetail = () => {
 
         <div className="detail-stat-card">
           <span className="detail-stat__value">
-            {monthlyUtil ? `${monthlyUtil.totalHours}h` : (latestRow['Leitura do Horímetro Inicial'] || '—')}
+            {monthlyUtil ? `${monthlyUtil.totalHours}h` : (extractHorimeterReading(latestRow) ? `${extractHorimeterReading(latestRow)}h` : '—')}
           </span>
           <span className="detail-stat__label">
             {monthlyUtil ? 'Horas no Mês' : 'Horímetro Atual (h)'}
@@ -183,7 +189,7 @@ const ForkliftDetail = () => {
                 <tbody>
                   {history.map((row, index) => {
                     const hasProblem = Object.values(row).includes('Não Conforme');
-                    const horimetro = row['Leitura do Horímetro Inicial'];
+                    const horimetro = extractHorimeterReading(row);
                     const turno = row['Turno (Manhã / Tarde)'];
                     return (
                       <tr key={index}>

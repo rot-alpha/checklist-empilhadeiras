@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { IGNORE_KEYS, calculateConformity } from '../data/csvParser';
+import { IGNORE_KEYS, calculateConformity, extractHorimeterReading } from '../data/csvParser';
 import './DailyInspectionModal.css';
 
 const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = [], usageInfo = null }) => {
@@ -168,10 +168,10 @@ const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = 
                   </div>
 
                   <div className="daily-meta-item">
-                    <span className="daily-meta-lbl">Horímetro Inicial</span>
+                    <span className="daily-meta-lbl">Leitura do Horímetro</span>
                     <strong className="daily-meta-text">
-                      {currentInspection['Leitura do Horímetro Inicial']
-                        ? `${currentInspection['Leitura do Horímetro Inicial']} h`
+                      {extractHorimeterReading(currentInspection)
+                        ? `${extractHorimeterReading(currentInspection)} h`
                         : '—'}
                     </strong>
                   </div>
