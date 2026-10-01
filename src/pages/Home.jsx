@@ -114,7 +114,7 @@ const Home = () => {
       <section className="home-stats">
         <div className="stat-card stat-card--highlight">
           <div className="stat-card__ring">
-            <ConformityRing value={generalConformity} size={72} strokeWidth={6} />
+            <ConformityRing value={generalConformity} size={76} strokeWidth={6} />
           </div>
           <div className="stat-card__info">
             <span className="stat-card__label">Conformidade Geral</span>

@@ -3,12 +3,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .conformity-ring__svg {
   transform: rotate(-90deg);
+  transform-origin: center;
   width: 100%;
   height: 100%;
+  display: block;
 }
 
 .conformity-ring__progress {
@@ -22,13 +25,29 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+  line-height: 1;
 }
 
 .conformity-ring__value {
-  font-size: 1.4rem;
   font-weight: 800;
   letter-spacing: -0.02em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.conformity-ring__num {
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.conformity-ring__pct {
+  font-size: 0.72em;
+  font-weight: 700;
+  margin-left: 1px;
   line-height: 1;
 }
 
@@ -38,4 +57,5 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  margin-top: 2px;
 }

@@ -16,9 +16,18 @@ const ConformityRing = ({ value = null, size = 100, strokeWidth = 8, label }) =>
   };
 
   const color = getColor(numericValue);
+  const valFontSize = Math.max(14, Math.round(size * 0.22));
 
   return (
-    <div className="conformity-ring" style={{ width: size, height: size }}>
+    <div 
+      className="conformity-ring" 
+      style={{ 
+        width: size, 
+        height: size,
+        minWidth: size,
+        minHeight: size 
+      }}
+    >
       <svg viewBox={`0 0 ${size} ${size}`} className="conformity-ring__svg">
         {/* Track */}
         <circle
@@ -46,8 +55,21 @@ const ConformityRing = ({ value = null, size = 100, strokeWidth = 8, label }) =>
         )}
       </svg>
       <div className="conformity-ring__content">
-        <span className="conformity-ring__value" style={{ color: hasValue ? color : 'var(--text-secondary)' }}>
-          {hasValue ? `${numericValue}%` : '—'}
+        <span 
+          className="conformity-ring__value" 
+          style={{ 
+            color: hasValue ? color : 'var(--text-secondary)',
+            fontSize: `${valFontSize}px` 
+          }}
+        >
+          {hasValue ? (
+            <>
+              <span className="conformity-ring__num">{numericValue}</span>
+              <span className="conformity-ring__pct">%</span>
+            </>
+          ) : (
+            '—'
+          )}
         </span>
         {label && <span className="conformity-ring__label">{label}</span>}
       </div>
