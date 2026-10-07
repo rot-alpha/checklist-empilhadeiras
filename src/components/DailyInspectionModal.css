@@ -411,6 +411,10 @@
   background: var(--status-ok);
 }
 
+.filter-dot.na {
+  background: var(--text-secondary);
+}
+
 /* Items Grid */
 .daily-items-grid {
   display: grid;
@@ -451,6 +455,11 @@
 
 .daily-item-card.is-ok {
   border-color: rgba(34, 197, 94, 0.25);
+}
+
+.daily-item-card.is-na {
+  border-color: var(--border-color);
+  opacity: 0.85;
 }
 
 .daily-item-info {
@@ -515,13 +524,29 @@
   }
 }
 
-.status-badge-other {
+.status-badge-na {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   background: var(--bg-card);
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.55rem;
   border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.status-badge-other {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
 }
 
 @media (max-width: 768px) {

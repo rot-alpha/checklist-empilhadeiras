@@ -11,7 +11,8 @@ import {
   filterByMonth,
   getMachineDailyUtilization,
   getMachineMonthlyUtilization,
-  extractHorimeterReading
+  extractHorimeterReading,
+  hasRowFault
 } from '../data/csvParser';
 import './ForkliftDetail.css';
 
@@ -188,7 +189,7 @@ const ForkliftDetail = () => {
                 </thead>
                 <tbody>
                   {history.map((row, index) => {
-                    const hasProblem = Object.values(row).includes('Não Conforme');
+                    const hasProblem = hasRowFault(row);
                     const horimetro = extractHorimeterReading(row);
                     const turno = row['Turno (Manhã / Tarde)'];
                     return (

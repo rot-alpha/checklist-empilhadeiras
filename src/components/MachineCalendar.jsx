@@ -4,6 +4,7 @@ import {
   getMachineMonthlyUtilization, 
   extractDateStr,
   extractDayKey,
+  hasRowFault,
   MONTH_NAMES 
 } from '../data/csvParser';
 import MonthlyUsageModal from './MonthlyUsageModal';
@@ -100,7 +101,7 @@ const MachineCalendar = ({ machineName, machineRows = [] }) => {
       const usageInfo = dailyMap[dayKey] || null;
       const dayInspections = inspectionsByDay[dayKey] || [];
       const hasInspection = dayInspections.length > 0;
-      const hasFault = dayInspections.some(r => Object.values(r).includes('Não Conforme'));
+      const hasFault = dayInspections.some(r => hasRowFault(r));
 
       cells.push({
         empty: false,

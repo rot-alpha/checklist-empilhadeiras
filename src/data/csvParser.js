@@ -19,6 +19,48 @@ export const IGNORE_KEYS = [
   'Observações sobre o estado geral da empilhadeira. (Opcional)'
 ];
 
+export function isIgnoreKey(key) {
+  if (!key) return true;
+  const k = key.trim().toLowerCase();
+  return (
+    k.includes('carimbo') ||
+    k.includes('data e hora') ||
+    k.includes('nome do operador') ||
+    k.includes('turno') ||
+    k === 'modelo' ||
+    k.includes('horímetro') ||
+    k.includes('horimetro') ||
+    k.includes('observações') ||
+    k.includes('observacoes')
+  );
+}
+
+export function isConforme(val) {
+  if (!val) return false;
+  const v = String(val).trim().toLowerCase();
+  return v === 'conforme' || v.includes('nível ok') || v.includes('nivel ok') || v === 'ok';
+}
+
+export function isNaoConforme(val) {
+  if (!val) return false;
+  const v = String(val).trim().toLowerCase();
+  return v === 'não conforme' || v === 'nao conforme';
+}
+
+export function isNaoSeAplica(val) {
+  if (!val) return false;
+  const v = String(val).trim().toLowerCase();
+  return v === 'não se aplica' || v === 'nao se aplica' || v === 'n/a';
+}
+
+export function hasRowFault(row) {
+  if (!row) return false;
+  return Object.entries(row).some(([key, value]) => {
+    if (isIgnoreKey(key)) return false;
+    return isNaoConforme(value);
+  });
+}
+
 export function extractMonthKey(dateStr) {
   if (!dateStr) return null;
   const match = String(dateStr).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -77,27 +119,32 @@ export function getFleetModels(data) {
 
 export function calculateConformity(rows) {
   if (!rows || rows.length === 0) return 0;
-  let totalFields = 0;
+  let totalEvaluated = 0;
   let conformeFields = 0;
 
   rows.forEach(row => {
     Object.entries(row).forEach(([key, value]) => {
-      if (!IGNORE_KEYS.includes(key) && (value === 'Conforme' || value === 'Não Conforme')) {
-        totalFields++;
-        if (value === 'Conforme') conformeFields++;
+      if (!isIgnoreKey(key)) {
+        if (isConforme(value)) {
+          totalEvaluated++;
+          conformeFields++;
+        } else if (isNaoConforme(value)) {
+          totalEvaluated++;
+        }
       }
     });
   });
 
-  return totalFields > 0 ? Math.round((conformeFields / totalFields) * 100) : 100;
+  return totalEvaluated > 0 ? Math.round((conformeFields / totalEvaluated) * 100) : 100;
 }
 
 export function getTopFaults(rows, limit = 5) {
   const faults = {};
   rows.forEach(row => {
     Object.entries(row).forEach(([key, value]) => {
-      if (!IGNORE_KEYS.includes(key) && value === 'Não Conforme') {
-        faults[key] = (faults[key] || 0) + 1;
+      if (!isIgnoreKey(key) && isNaoConforme(value)) {
+        const cleanKey = key.trim().replace(/\s+/g, ' ');
+        faults[cleanKey] = (faults[cleanKey] || 0) + 1;
       }
     });
   });
@@ -349,13 +396,29 @@ export function getMachineMonthlyUtilization(dailyMap, monthKey) {
 }
 
 export function getMachineStatus(row) {
-  const criticos = ['Botão de Emergência', 'Funcionamento de Direção', 'Cinto de Segurança', 'Sistema de Elevação/Abaixamento'];
+  if (!row) return { key: 'ok', label: 'Disponível', color: 'var(--status-ok)' };
+
   let isCritical = false;
   let isAlert = false;
 
   for (const [key, value] of Object.entries(row)) {
-    if (value === 'Não Conforme') {
-      if (criticos.includes(key) || key.includes('VAZAMENTO') || key.includes('Óleo')) {
+    if (isIgnoreKey(key)) continue;
+
+    if (isNaoConforme(value)) {
+      const k = key.trim().toLowerCase();
+      if (
+        k.includes('emergência') ||
+        k.includes('emergencia') ||
+        k.includes('direção') ||
+        k.includes('direcao') ||
+        k.includes('cinto') ||
+        k.includes('elevação') ||
+        k.includes('elevacao') ||
+        k.includes('vazamento') ||
+        k.includes('óleo') ||
+        k.includes('oleo') ||
+        k.includes('freio')
+      ) {
         isCritical = true;
       } else {
         isAlert = true;
@@ -367,3 +430,4 @@ export function getMachineStatus(row) {
   if (isAlert) return { key: 'alert', label: 'Atenção', color: 'var(--status-alert)' };
   return { key: 'ok', label: 'Disponível', color: 'var(--status-ok)' };
 }
+

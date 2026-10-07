@@ -1,10 +1,17 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { IGNORE_KEYS, calculateConformity, extractHorimeterReading } from '../data/csvParser';
+import { 
+  isIgnoreKey, 
+  isConforme, 
+  isNaoConforme, 
+  isNaoSeAplica, 
+  calculateConformity, 
+  extractHorimeterReading 
+} from '../data/csvParser';
 import './DailyInspectionModal.css';
 
 const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = [], usageInfo = null }) => {
   const [activeInspectionIndex, setActiveInspectionIndex] = useState(0);
-  const [filterType, setFilterType] = useState('all'); // 'all', 'faults', 'ok'
+  const [filterType, setFilterType] = useState('all'); // 'all', 'faults', 'ok', 'na'
 
   // Reset states when day changes or modal opens
   useEffect(() => {
@@ -39,23 +46,32 @@ const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = 
     if (!currentInspection) return [];
     const items = [];
     Object.entries(currentInspection).forEach(([key, value]) => {
-      if (!IGNORE_KEYS.includes(key) && key.trim() !== '') {
+      if (!isIgnoreKey(key) && key.trim() !== '') {
         const val = (value || '').trim();
-        const isNotConforme = val.toLowerCase() === 'não conforme';
-        const isConforme = val.toLowerCase() === 'conforme';
+        const cleanName = key.trim().replace(/\s+/g, ' ');
         
+        let status = 'other';
+        if (isNaoConforme(val)) {
+          status = 'fault';
+        } else if (isConforme(val)) {
+          status = 'ok';
+        } else if (isNaoSeAplica(val)) {
+          status = 'na';
+        }
+
         items.push({
-          name: key,
+          name: cleanName,
           value: val || 'Não respondido',
-          status: isNotConforme ? 'fault' : isConforme ? 'ok' : 'other',
+          status,
         });
       }
     });
 
-    // Sort: faults first, then ok, then others
+    // Sort: faults first, then ok, then na, then others
+    const order = { fault: 1, ok: 2, na: 3, other: 4 };
     return items.sort((a, b) => {
-      if (a.status === 'fault' && b.status !== 'fault') return -1;
-      if (a.status !== 'fault' && b.status === 'fault') return 1;
+      const diff = (order[a.status] || 5) - (order[b.status] || 5);
+      if (diff !== 0) return diff;
       return a.name.localeCompare(b.name);
     });
   }, [currentInspection]);
@@ -64,11 +80,13 @@ const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = 
   const filteredItems = useMemo(() => {
     if (filterType === 'faults') return checklistItems.filter(i => i.status === 'fault');
     if (filterType === 'ok') return checklistItems.filter(i => i.status === 'ok');
+    if (filterType === 'na') return checklistItems.filter(i => i.status === 'na');
     return checklistItems;
   }, [checklistItems, filterType]);
 
   const faultCount = checklistItems.filter(i => i.status === 'fault').length;
   const okCount = checklistItems.filter(i => i.status === 'ok').length;
+  const naCount = checklistItems.filter(i => i.status === 'na').length;
   const conformityRate = currentInspection ? calculateConformity([currentInspection]) : 100;
 
   if (!isOpen) return null;
@@ -247,6 +265,15 @@ const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = 
                     <span className="filter-dot ok" />
                     Conformes ({okCount})
                   </button>
+                  {naCount > 0 && (
+                    <button
+                      className={`daily-filter-btn na ${filterType === 'na' ? 'active' : ''}`}
+                      onClick={() => setFilterType('na')}
+                    >
+                      <span className="filter-dot na" />
+                      Não se Aplica ({naCount})
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -262,7 +289,7 @@ const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = 
                   {filteredItems.map((item, idx) => (
                     <div 
                       key={idx} 
-                      className={`daily-item-card ${item.status === 'fault' ? 'is-fault' : item.status === 'ok' ? 'is-ok' : ''}`}
+                      className={`daily-item-card ${item.status === 'fault' ? 'is-fault' : item.status === 'ok' ? 'is-ok' : item.status === 'na' ? 'is-na' : ''}`}
                     >
                       <div className="daily-item-info">
                         <span className="daily-item-number">#{idx + 1}</span>
@@ -275,7 +302,7 @@ const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = 
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                               <polyline points="20 6 9 17 4 12"/>
                             </svg>
-                            Conforme
+                            {item.value}
                           </span>
                         )}
                         {item.status === 'fault' && (
@@ -285,7 +312,16 @@ const DailyInspectionModal = ({ isOpen, onClose, machineName, dayKey, dayRows = 
                               <line x1="12" y1="8" x2="12" y2="12"/>
                               <line x1="12" y1="16" x2="12.01" y2="16"/>
                             </svg>
-                            Não Conforme
+                            {item.value}
+                          </span>
+                        )}
+                        {item.status === 'na' && (
+                          <span className="status-badge-na">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <circle cx="12" cy="12" r="10"/>
+                              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                            </svg>
+                            {item.value}
                           </span>
                         )}
                         {item.status === 'other' && (

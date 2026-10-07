@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PptxGenJS from 'pptxgenjs';
-import { MONTH_NAMES, filterByMonth, calculateConformity, getTopFaults, getAvailableMonths } from '../data/csvParser';
+import { filterByMonth, calculateConformity, getTopFaults, getAvailableMonths } from '../data/csvParser';
 import './ExportModal.css';
 
 const THEMES = [
@@ -132,11 +132,12 @@ const ExportModal = ({ isOpen, onClose, fullData, machines }) => {
           bold: true,
         });
 
-        const conformity = calculateConformity(machineData);
-        const machineFaults = getTopFaults(machineData, 5);
+        const hasInspections = machineData.length > 0;
+        const conformity = hasInspections ? calculateConformity(machineData) : null;
+        const machineFaults = hasInspections ? getTopFaults(machineData, 5) : [];
 
         // Conformity badge
-        const badgeColor = conformity >= 80 ? '22C55E' : conformity >= 50 ? 'F59E0B' : 'EF4444';
+        const badgeColor = !hasInspections ? '888888' : conformity >= 80 ? '22C55E' : conformity >= 50 ? 'F59E0B' : 'EF4444';
 
         slide.addShape(pptx.ShapeType.roundRect, {
           x: 0.8, y: 1.4, w: 3, h: 1.5,
@@ -145,7 +146,7 @@ const ExportModal = ({ isOpen, onClose, fullData, machines }) => {
           rectRadius: 0.15,
         });
 
-        slide.addText(`${conformity}%`, {
+        slide.addText(hasInspections ? `${conformity}%` : '—', {
           x: 0.8, y: 1.5, w: 3, h: 0.8,
           fontSize: 36, fontFace: 'Calibri', color: badgeColor,
           bold: true, align: 'center',
@@ -160,7 +161,7 @@ const ExportModal = ({ isOpen, onClose, fullData, machines }) => {
         // Machine info
         const infoRows = [
           ['Inspeções no período', String(machineData.length)],
-          ['Status', conformity >= 80 ? 'Disponível' : conformity >= 50 ? 'Atenção' : 'Parada'],
+          ['Status', !hasInspections ? 'Sem inspeções' : conformity >= 80 ? 'Disponível' : conformity >= 50 ? 'Atenção' : 'Parada'],
         ];
 
         slide.addTable(infoRows, {
@@ -173,7 +174,7 @@ const ExportModal = ({ isOpen, onClose, fullData, machines }) => {
         });
 
         // Faults list
-        if (machineFaults.length > 0) {
+        if (hasInspections && machineFaults.length > 0) {
           slide.addText('Não-Conformidades', {
             x: 0.8, y: 3.5, w: 10, h: 0.5,
             fontSize: 14, fontFace: 'Calibri', color: theme.primary,
@@ -194,11 +195,17 @@ const ExportModal = ({ isOpen, onClose, fullData, machines }) => {
             color: theme.text,
             headerRow: true,
           });
-        } else {
+        } else if (hasInspections) {
           slide.addText('✓ Nenhuma não-conformidade no período', {
             x: 0.8, y: 3.5, w: 10, h: 0.5,
             fontSize: 13, fontFace: 'Calibri', color: '22C55E',
             bold: true,
+          });
+        } else {
+          slide.addText('Nenhuma inspeção realizada no período selecionado', {
+            x: 0.8, y: 3.5, w: 10, h: 0.5,
+            fontSize: 13, fontFace: 'Calibri', color: '888888',
+            italic: true,
           });
         }
       });
